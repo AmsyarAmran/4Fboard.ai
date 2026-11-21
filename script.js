@@ -83,7 +83,7 @@ function renderSaved(){
   saved.forEach((item,i)=>{const card=document.createElement("div");card.className="file-row";const name=document.createElement("strong");name.textContent=item;const open=document.createElement("button");open.className="secondary-button";open.textContent="Open lesson";open.addEventListener("click",()=>createLesson(item));card.append(name,open);el.appendChild(card);});
 }
 $("#saveLesson").addEventListener("click",()=>{if(!currentPrompt)return; if(!saved.includes(currentPrompt))saved.unshift(currentPrompt);renderSaved();toast("Lesson saved in this session.");});
-$("#followupForm").addEventListener("submit",e=>{e.preventDefault();const q=$("#followupInput").value.trim();if(!q){toast("Type a follow-up question first.");return;}$("#followupAnswer").textContent="Good question. Try connecting it to the main idea: “"+currentPrompt+"”. This preview does not generate live AI answers yet; connect an AI backend to enable personalised help.";$("#followupInput").value="";});
+$("#followupForm").addEventListener("submit",async e=>{e.preventDefault();const q=$("#followupInput").value.trim();if(!q){toast("Type a follow-up question first.");return;}const answer=$("#followupAnswer");answer.textContent=language==="ms"?"Sedang mendapatkan jawapan...":"Getting an answer...";$("#followupInput").value="";try{answer.textContent=await askTutor("Context: "+currentPrompt+"\\n\\nFollow-up question: "+q,"followup");}catch(error){answer.textContent=error.message;}});
 function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
 function saveUndo(){try{undoStack.push(ctx.getImageData(0,0,canvas.width,canvas.height));if(undoStack.length>20)undoStack.shift();}catch{}}
 canvas.addEventListener("pointerdown",e=>{drawing=true;canvas.setPointerCapture(e.pointerId);saveUndo();lastPoint=point(e);});
@@ -108,6 +108,13 @@ const translations={
   ms:{crumb:"Belajar",heading:"Jadikan setiap",copy:"Tanya apa sahaja. Teroka setiap langkah. Belajar cara anda.",question:"Apa yang kita belajar hari ini?",start:"Cipta pelajaran",inspire:"Perlukan sedikit inspirasi?"}
 };
 let language="en";
+const AI_API_URL = "https://4fboard-ai-api.amsyar291008.workers.dev";
+async function askTutor(prompt, mode){
+  const response = await fetch(`${AI_API_URL}/api/chat`, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,mode,language})});
+  const data = await response.json().catch(()=>({}));
+  if(!response.ok) throw new Error(data.error || `AI request failed (${response.status})`);
+  return data.answer;
+}
 function setLanguage(lang){
   language=lang;const t=translations[lang];$("#crumbCurrent").textContent=t.crumb;$(".panel-heading strong").textContent=t.question;$("#topicInput").placeholder=lang==="ms"?"Apakah yang ingin anda fahami hari ini?":"What would you like to understand today?";$(".start-button",$("#promptForm")).innerHTML=t.start+' <span>↗</span>';$(".welcome-copy").textContent=t.copy;$(".section-title-row strong").textContent=t.inspire;$("#languageButton").innerHTML=(lang==="en"?"EN":"MS")+' <span>⌄</span>';$("#settingsLanguage").value=lang;
 }
