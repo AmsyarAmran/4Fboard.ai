@@ -22,13 +22,13 @@ A responsive visual-learning website starter built with vanilla HTML, CSS and Ja
 - Library file list and drag/drop
 - Help dialog and mobile navigation
 
-## Important: AI connection
-This preview does not call a live AI model. Lesson outlines and follow-up responses are local demo content. To enable genuine AI explanations, add a secure backend endpoint and store provider API keys on the server — never in browser JavaScript.
+## AI status
+The frontend is connected to the deployed Cloudflare Worker API. AI responses will become active after the `OPENAI_API_KEY` secret is added to that Worker in Cloudflare. Never put the key in `script.js` or commit it to GitHub.
 
 ## Files
 - `index.html` — page structure
 - `style.css` — visual design and responsive layout
-- `script.js` — interactions and demo behaviour
+- `script.js` — interactions and AI Tutor API calls
 
 
 ## AI Tutor backend (Cloudflare Workers + OpenAI)
