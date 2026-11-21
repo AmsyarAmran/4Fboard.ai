@@ -29,3 +29,24 @@ This preview does not call a live AI model. Lesson outlines and follow-up respon
 - `index.html` — page structure
 - `style.css` — visual design and responsive layout
 - `script.js` — interactions and demo behaviour
+
+
+## AI Tutor backend (Cloudflare Workers + OpenAI)
+
+The secure API lives in `worker/index.js`. The browser calls the Worker; the OpenAI key stays in a Cloudflare secret and is never placed in frontend JavaScript.
+
+### Configure and deploy
+1. Install Wrangler: `npm install -g wrangler`
+2. Sign in: `wrangler login`
+3. From the repository root, set the OpenAI key as a secret (never commit it):
+   `wrangler secret put OPENAI_API_KEY`
+4. Deploy:
+   `wrangler deploy`
+5. Add the Worker URL to the frontend setting `AI_API_URL` in `script.js` if it differs from the configured URL.
+6. Configure `ALLOWED_ORIGINS` in Cloudflare with the exact origin(s) of the published website. Localhost is allowed for local testing.
+
+### API
+- `GET /health` — service status (does not reveal secrets).
+- `POST /api/chat` — JSON body: `{ "prompt": "...", "mode": "topic|exam|homework|followup", "language": "en|ms" }`.
+
+The first release generates text lessons and follow-up answers. Uploaded PDF/image parsing and persistent chat history are not included yet.
