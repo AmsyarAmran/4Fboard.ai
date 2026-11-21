@@ -56,8 +56,8 @@ function createLesson(prompt){
   $("#lessonTitle").textContent=currentTitle;
   $("#lessonSubtitle").textContent=({topic:"Let's break this idea down into clear, visual steps.",exam:"Let's organise your revision into key ideas and checkpoints.",homework:"Let's understand the question before working towards an answer."})[activeMode];
   $("#lessonModeLabel").textContent=({topic:"TOPIC LESSON",exam:"EXAM PREP",homework:"HOMEWORK GUIDE"})[activeMode];
-  const modeText={topic:"Explore the core idea\n\n1. Start with the main concept.\n2. Connect it to a simple example.\n3. Check what you understand and what needs another look.",exam:"Revision roadmap\n\n1. Identify the key facts and definitions.\n2. Group related ideas into a short summary.\n3. Practise recalling the information.\n\nAdd your notes or study guide to build a focused revision session.",homework:"A step-by-step approach\n\n1. Read the question and identify what it asks.\n2. List the information you already know.\n3. Work through one step at a time and check your reasoning.\n\nTry the follow-up box if you want a hint."};
-  $("#lessonExplanation").textContent=modeText[activeMode];
+  $("#lessonExplanation").textContent=language==="ms"?"Sedang menyediakan penerangan AI...":"Generating your AI lesson...";
+  askTutor(prompt,activeMode).then(answer=>{$("#lessonExplanation").textContent=answer;}).catch(error=>{$("#lessonExplanation").textContent=error.message;});
   drawStarter(prompt);showView("lesson");recent.unshift(prompt);renderRecent();
   $("#followupAnswer").textContent="";
 }
